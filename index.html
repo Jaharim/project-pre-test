@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ko-KR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Timer</title>
+
+    <!-- CSS -->
+    <style>
+      h1 {
+        margin: 0;
+        color: white;
+        font-size: 24px;
+      }
+
+      button {
+        margin: 0;
+        padding: 0;
+        background: none;
+        border: none;
+      }
+      body {
+        background: radial-gradient(
+          96.74% 276.79% at 3.59% 5.28%,
+          #f0f4ff 0%,
+          #a5b6ee 100%
+        );
+      }
+
+      .timer {
+        width: 600px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0 auto;
+      }
+
+      .container {
+        width: 400px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0 auto;
+      }
+
+      .logo {
+        width: 244px;
+        margin-top: 72px;
+        margin-bottom: 60px;
+      }
+
+      .timer-contents {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-evenly;
+        width: 400px;
+        height: 360px;
+        margin-bottom: 60px;
+        gap: 40px;
+        background: linear-gradient(144.07deg, #5572bb 2.13%, #374b7c 102.97%);
+        /* shadow */
+
+        box-shadow: 20px 20px 60px 10px rgba(55, 75, 124, 0.4);
+        border-radius: 16px;
+      }
+
+      .timer-btns img {
+        display: inline-block;
+        width: 100px;
+        height: 50px;
+      }
+
+      .corp-name {
+        font-size: 17px;
+        color: #8596bf;
+        margin-bottom: 103px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="timer">
+      <div class="container">
+        <img class="logo" src="./weniv-logo.svg" alt="위니브로고" />
+        <div class="timer-contents">
+          <h1>TIMER</h1>
+          <div class="timer-inputs">
+            <input id="hours" type="number" min="0" max="23" value="00" />
+            <input id="minutes" type="number" min="0" max="59" value="00" />
+            <input id="seconds" type="number" min="0" max="59" value="00" />
+          </div>
+          <div class="timer-btns">
+            <button id="btn-start">
+              <img src="./start-disabled.svg" />
+            </button>
+            <button id="btn-reset">
+              <img src="./reset-disabled.svg" />
+            </button>
+          </div>
+        </div>
+        <span class="corp-name">ⓒ WENIV Corp.</span>
+      </div>
+    </div>
+    <!-- JavaScript -->
+    <script>
+      function $(el) {
+        return document.querySelector(el);
+      }
+      let timer;
+      let startFlag = false;
+      let alreadyStart = false;
+      let totalSecond;
+
+      function startTimer() {
+        if (!startFlag) {
+          //start 버튼을 눌렀을 때
+          if (!alreadyStart) {
+            //pause를 한 번이라도 눌렀을 때
+            const hours = parseInt(document.getElementById('hours').value);
+            const minutes = parseInt(document.getElementById('minutes').value);
+            const seconds = parseInt(document.getElementById('seconds').value);
+            console.log(hours, minutes, seconds);
+            totalSecond = hours * 3600 + minutes * 60 + seconds;
+          }
+          //   console.log(totalSecond);
+          timer = setInterval(() => {
+            //타이머가 전체 시간(초)값을 1초마다 1씩 차감
+            totalSecond--;
+            // console.log(totalSecond);
+            const nowHours = Math.floor(totalSecond / 3600);
+            const nowMinutes = Math.floor((totalSecond % 3600) / 60);
+            const nowSeconds = totalSecond % 60;
+            console.log(
+              `${nowHours.toString().padStart(2, '0')}:${nowMinutes
+                .toString()
+                .padStart(2, '0')}:${nowSeconds.toString().padStart(2, '0')}`
+            );
+            if (totalSecond === 0) {
+              //타이머가 끝났을 때
+              clearInterval(timer);
+              startFlag = false;
+            }
+          }, 1000);
+          startFlag = true;
+          alreadyStart = false;
+        } else {
+          //pause 버튼을 눌렀을 때
+          startFlag = false;
+          alreadyStart = true;
+          clearInterval(timer);
+        }
+      }
+
+      const startBtn = $('#btn-start');
+      const resetBtn = $('#btn-reset');
+
+      startBtn.addEventListener('click', () => {
+        const hours = parseInt(document.getElementById('hours').value);
+        const minutes = parseInt(document.getElementById('minutes').value);
+        const seconds = parseInt(document.getElementById('seconds').value);
+        if (hours > 0 || minutes > 0 || seconds > 0) startTimer();
+      });
+
+      resetBtn.addEventListener('click', () => {
+        //reset 버튼을 눌렀을 때
+        clearInterval(timer);
+        startFlag = false;
+        alreadyStart = false;
+        totalSecond = 0;
+      });
+    </script>
+  </body>
+</html>
+<!-- 타이머 -->
+<!-- 
+    1. 시/분/초 입력받기
+    2. 입력받은 시간 전부 초로 계산하기 totalSecond
+    3. start버튼 누르면 setInterval로 1초마다 깎으면서
+      시/분/초로 나눠서 뿌려주기 totalSecond--;
+    4. pause 버튼 누르면 clearInterval 해주기
+        - 이 때 input에 있는 시간 다시 가져오면 안됨
+    5. start 버튼 누르면 다시 setInterval 해주기
+    6. reset 버튼 누르면 인풋, totalSecond, startFlag, alreadyStart 초기화
+ -->
+
+<!-- 처음엔 인풋이었다가 start 버튼 누르면 display:none해주고 3에서 뿌려준 시간들이 display 되면서 보이게 -->
+<!-- input 옆에 버튼 숨기기 -->
